@@ -13,6 +13,6 @@ export class UserController{
 
     @Post()
     async create(@Body(new ValidationPipe()) userDto: UserDto ){
-        return userDto;
+        return await this.userService.create(userDto);
     }
 }
