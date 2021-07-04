@@ -17,8 +17,8 @@ export class AuthService {
     async validateUser(loginDto: LoginDto ){
         const {email, password} = loginDto;
 
-        const user = await this.userService.findByEmail(email);
- 
+        const user = await this.userService.findByEmailForLogin(email);
+   
         if(user){
            const passwordIsValid = bcrypt.compareSync(password, user.password);
            if(passwordIsValid){
@@ -28,12 +28,16 @@ export class AuthService {
         return null;
     }
 
+    /**
+     * @returns A new JWT as a cookie
+     */
     async login(user: UserDocument){
-     
         const payload = { username: user.email, sub: user._id };
-   
-        return {
-            access_token: this.jwtService.sign(payload)
-        }
+        const token = this.jwtService.sign(payload);
+        return `Authentification=${token}; HttpOnly; Path=/;`;
+    }
+
+    async retrieveUser(userId: string){
+        return this.userService.findById(userId);
     }
 }

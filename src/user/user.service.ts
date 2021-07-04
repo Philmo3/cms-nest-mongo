@@ -6,6 +6,7 @@ import { CmsBadRequestExeption } from "src/resources/exeptions/badRequest.exepti
 import { CmsBadRequestFilter } from "src/resources/exeptions/badRequest.filter";
 import { UserDocument } from "./user.shema";
 import * as bcrypt from 'bcrypt'
+import { UserSerializer } from "src/resources/serializer/user.serializer";
 
 @UseFilters(CmsBadRequestFilter)
 @Injectable()
@@ -16,13 +17,23 @@ export class UserService{
         return this.userModel.find().exec()
     }
 
-    async findByEmail(email: string): Promise<UserDocument>{
-        return await this.userModel.findOne({email}).exec();
+    /**
+     * WARNING!!! this method should only be use for login purpose
+     * with this method the password is visible !!!WARNING
+     * @param email the email of the user
+     * @returns UserDocument
+     */
+    async findByEmailForLogin(email: string): Promise<UserDocument>{
+        return await this.userModel.findOne({email}, {email: 1, password: 1, lastName: 1, name: 1}).exec();
+    }
+
+    async findById(userId: string){
+        return new UserSerializer().documentToDto(await this.userModel.findById(userId).exec());
     }
 
     async create(user: UserDto){
 
-        const userExist = await this.findByEmail(user.email);
+        const userExist = await this.findByEmailForLogin(user.email);
 
         if(userExist){
             throw new CmsBadRequestExeption('A user with this email already exist', UserService.name);
@@ -32,8 +43,8 @@ export class UserService{
 
         user.password = hashPaswword;
 
-        const newUser = new this.userModel(user).save();
+        const newUser = await new this.userModel(user).save();
 
-        return newUser;
+        return  new UserSerializer().documentToDto(newUser);
     }
 }
