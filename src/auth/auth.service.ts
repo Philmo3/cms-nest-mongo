@@ -5,13 +5,15 @@ import * as bcrypt from 'bcrypt'
 import { UserSerializer } from 'src/resources/serializer/user.serializer';
 import { JwtService } from '@nestjs/jwt';
 import { UserDocument } from 'src/user/user.shema';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
 
     constructor(
         private readonly userService: UserService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly configService: ConfigService
         ){}
 
     async validateUser(loginDto: LoginDto ){
@@ -33,11 +35,27 @@ export class AuthService {
      */
     async login(user: UserDocument){
         const payload = { username: user.email, sub: user._id };
-        const token = this.jwtService.sign(payload);
-        return `Authentification=${token}; HttpOnly; Path=/;`;
+        return {
+            loginCookie: this.jwtLoginCookie(payload),
+            refreshCookie: this.jwtRefreshCookie(payload)
+        }
     }
 
     async retrieveUser(userId: string){
         return this.userService.findById(userId);
+    }
+
+    private jwtLoginCookie(payload: {username: string, sub: string}){
+        const token = this.jwtService.sign(payload);
+        return `Authentification=${token}; HttpOnly; Path=/;`;
+    }
+
+    private jwtRefreshCookie(payload: {username: string, sub: string}){
+        const expiresSeconds = `${this.configService.get('JWT_REFRESH_TTL')}s`
+
+        const token = this.jwtService.sign(payload, {
+            expiresIn: expiresSeconds
+        });
+        return `refresh=${token}; HttpOnly; Path=/; Max-Age=${expiresSeconds}`;
     }
 }
