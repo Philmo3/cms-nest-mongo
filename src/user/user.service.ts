@@ -27,6 +27,10 @@ export class UserService{
         return await this.userModel.findOne({email}, {email: 1, password: 1, lastName: 1, name: 1}).exec();
     }
 
+    async findByEmail(email: string): Promise<UserDocument>{
+        return await this.userModel.findOne({email}).exec();
+    }
+
     async findById(userId: string){
         return new UserSerializer().documentToDto(await this.userModel.findById(userId).exec());
     }

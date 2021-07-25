@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, ValidationPipe } from "@nestjs/common";
 import { UserDto } from "src/resources/dtos/user.dto";
 import { UserService } from "./user.service";
 
@@ -9,6 +9,11 @@ export class UserController{
     @Get()
     async search(){
         return await this.userService.search();
+    }
+
+    @Get('by-email')
+    async searchByEmail(@Param('email') email: string){
+        return await this.userService.findByEmail(email);
     }
 
     @Post()
