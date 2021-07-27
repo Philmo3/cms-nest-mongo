@@ -13,7 +13,6 @@ export class CompanyService {
 
 	async create(companyDto: CompanyDto): Promise<CompanyDocument> {
 		const companyExist = await this.findByEmail(companyDto.email);
-		console.log(companyExist);
 		if (companyExist) {
 			throw new CmsBadRequestExeption(
 				'A company with this email already exist',
@@ -27,7 +26,6 @@ export class CompanyService {
 	}
 
 	async findByEmail(email: string) {
-		console.log(email);
 		return await this.companyModel.findOne({ email }).exec();
 	}
 }

@@ -15,13 +15,11 @@ export class CompanyController {
 
 	@Get('by-email')
 	async getByEmail(@Query('email') email: string) {
-		console.log(email);
 		return await this.companyService.findByEmail(email);
 	}
 
 	@Post()
 	async create(@Body(new ValidationPipe()) company: CompanyDto) {
-		console.log('hello');
 		return await this.companyService.create(company);
 	}
 }

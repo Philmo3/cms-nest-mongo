@@ -20,7 +20,6 @@ export class UserController {
 
 	@Get('by-email')
 	async searchByEmail(@Query('email') email: string) {
-		console.log(email);
 		return await this.userService.findByEmail(email);
 	}
 
