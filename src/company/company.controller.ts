@@ -2,7 +2,7 @@ import {
 	Body,
 	Controller,
 	Get,
-	Param,
+	Query,
 	Post,
 	ValidationPipe,
 } from '@nestjs/common';
@@ -14,7 +14,8 @@ export class CompanyController {
 	constructor(private companyService: CompanyService) {}
 
 	@Get('by-email')
-	async getByEmail(@Param('email') email: string) {
+	async getByEmail(@Query('email') email: string) {
+		console.log(email);
 		return await this.companyService.findByEmail(email);
 	}
 

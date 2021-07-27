@@ -27,6 +27,7 @@ export class CompanyService {
 	}
 
 	async findByEmail(email: string) {
+		console.log(email);
 		return await this.companyModel.findOne({ email }).exec();
 	}
 }

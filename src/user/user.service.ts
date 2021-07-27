@@ -51,7 +51,10 @@ export class UserService {
 
 		user.password = hashPaswword;
 
-		const newUser = await new this.userModel(user).save();
+		const newUser = await new this.userModel({
+			...user,
+			company: user.companyId,
+		}).save();
 
 		return new UserSerializer().documentToDto(newUser);
 	}
