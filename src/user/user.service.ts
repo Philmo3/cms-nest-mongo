@@ -34,7 +34,7 @@ export class UserService {
 	}
 
 	async findById(userId: string) {
-		return await this.userModel.findById(userId).populate('companyId').exec();
+		return await this.userModel.findById(userId).populate('company').exec();
 	}
 
 	async create(user: UserDto) {

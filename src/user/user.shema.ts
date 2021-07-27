@@ -23,7 +23,7 @@ export class User {
 		type: SchemaTypes.ObjectId,
 		ref: 'companies',
 	})
-	companyId: Types.ObjectId;
+	company: Types.ObjectId;
 }
 
 export const UserShema = SchemaFactory.createForClass(User);
