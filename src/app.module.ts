@@ -6,8 +6,8 @@ import { UsersModule } from './user/user.module';
 import { ComponentModule } from './component/component.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { CompanyController } from './company/company.controller';
 import { CompanyModule } from './company/company.module';
+import { SitesModule } from './sites/sites.module';
 
 @Module({
 	imports: [
@@ -23,6 +23,7 @@ import { CompanyModule } from './company/company.module';
 			isGlobal: true,
 		}),
 		CompanyModule,
+		SitesModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

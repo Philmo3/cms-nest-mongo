@@ -8,41 +8,57 @@ import WithUserRequest from 'src/resources/requests/withUser.request';
 import { UserDocument } from 'src/user/user.shema';
 import { AuthService } from './auth.service';
 
-export class LoginDto{
+export class LoginDto {
+	@IsEmail()
+	@IsString()
+	email: string;
 
-    @IsEmail()
-    @IsString()
-    email: string;
-
-    @IsString()
-    password: string;
+	@IsString()
+	password: string;
 }
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService){}
+	constructor(private readonly authService: AuthService) {}
 
-    @UseGuards(JwtAuthGuard)
-    @Post('me')
-    async whoAmI(@Req() req: any){
-        return await this.authService.retrieveUser(req.user.userId);
-    }
+	@UseGuards(JwtAuthGuard)
+	@Post('me')
+	async whoAmI(@Req() req: any) {
+		return await this.authService.retrieveUser(req.user.userId);
+	}
 
-    @UseGuards(LocalAuthGuard)
-    @Post('login')
-    async login(@Req() req: WithUserRequest, @Res() response: Response){
-        const cookie = await this.authService.login(req.user);
-        response.setHeader('Set-Cookie',[ cookie.loginCookie,cookie.refreshCookie]);
-        return response.send(req.user)
-    }
+	@UseGuards(LocalAuthGuard)
+	@Post('login')
+	async login(@Req() req: WithUserRequest, @Res() response: Response) {
+		const cookie = await this.authService.login(req.user);
+		response.setHeader('Set-Cookie', [
+			cookie.loginCookie,
+			cookie.refreshCookie,
+		]);
+		return response.send(req.user);
+	}
 
-    @UseGuards(JwtRefreshAuthGuard)
-    @Post('refresh')
-    async refresh(@Req() req: any, @Res() response: Response){
-        const cookie = await this.authService.login(await this.authService.retrieveUser(req.user.userId) as UserDocument);
-        response.setHeader('Set-Cookie',[ cookie.loginCookie,cookie.refreshCookie]);
-        return response.send(req.user)
-    }
+	@UseGuards(JwtRefreshAuthGuard)
+	@Post('refresh')
+	async refresh(@Req() req: any, @Res() response: Response) {
+		const cookie = await this.authService.login(
+			(await this.authService.retrieveUser(req.user.userId)) as UserDocument,
+		);
+		response.setHeader('Set-Cookie', [
+			cookie.loginCookie,
+			cookie.refreshCookie,
+		]);
+		return response.send(req.user);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Post('logout')
+	async logout(@Req() req: any, @Res() response: Response) {
+		response.setHeader('Set-Cookie', [
+			'Authentification=; HttpOnly; Path=/;',
+			'refresh=; HttpOnly; Path=/; Max-Age=0',
+		]);
+
+		return response.send({});
+	}
 }
-
-
