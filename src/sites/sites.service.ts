@@ -3,12 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 import { SiteDto } from 'src/resources/dtos/site.dto';
+import { SiteCreateDto } from 'src/resources/dtos/siteCreate.dto';
 import { SiteSearchDto } from 'src/resources/dtos/siteSearch.dto';
 import { CmsBadRequestExeption } from 'src/resources/exeptions/badRequest.exeption';
 import { SiteSerializer } from 'src/resources/serializer/site.serializer';
 import { SiteDocument } from './sites.shema';
 
 const cryptoJs = require('crypto-js');
+
+import * as fs from 'fs';
+import { appendPublicFile } from 'src/resources/functions/appendFile';
 
 @Injectable()
 export class SitesService {
@@ -46,7 +50,10 @@ export class SitesService {
 		return serializedSite;
 	}
 
-	async create(siteDto: SiteDto): Promise<SiteDto> {
+	async create(
+		siteDto: SiteCreateDto,
+		siteImage: Express.Multer.File,
+	): Promise<SiteDto> {
 		const siteExist = await this.siteModel
 			.find({ name: siteDto.name, company: siteDto.companyId })
 			.exec();
@@ -56,6 +63,11 @@ export class SitesService {
 				'A site with this name already exist inside your company',
 				SitesService.name,
 			);
+		}
+
+		// place the file if there is one
+		if (siteImage) {
+			siteDto.siteImageUrl = await appendPublicFile(siteImage);
 		}
 
 		const site = await new this.siteModel({
@@ -70,7 +82,6 @@ export class SitesService {
 	}
 
 	private generateSiteKey(name: string, companyId: string): string {
-		console.log(cryptoJs);
 		return cryptoJs.AES.encrypt(
 			name + companyId,
 			process.env.SITE_SECRET,

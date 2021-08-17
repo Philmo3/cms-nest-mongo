@@ -8,11 +8,16 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CompanyModule } from './company/company.module';
 import { SitesModule } from './sites/sites.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
 	imports: [
 		MongooseModule.forRoot('mongodb://localhost:27017/cms', {
 			useCreateIndex: true,
+		}),
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, '..', 'uploads'),
 		}),
 		UsersModule,
 		ComponentModule,
