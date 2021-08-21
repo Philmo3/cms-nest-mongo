@@ -11,7 +11,6 @@ import { SiteDocument } from './sites.shema';
 
 const cryptoJs = require('crypto-js');
 
-import * as fs from 'fs';
 import { appendPublicFile } from 'src/resources/functions/appendFile';
 
 @Injectable()
@@ -65,7 +64,6 @@ export class SitesService {
 			);
 		}
 
-		// place the file if there is one
 		if (siteImage) {
 			siteDto.siteImageUrl = await appendPublicFile(siteImage);
 		}
