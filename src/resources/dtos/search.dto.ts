@@ -1,4 +1,4 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class SearchDto {
 	@IsNumber()
@@ -6,4 +6,7 @@ export class SearchDto {
 
 	@IsNumber()
 	perPage?: number;
+
+	@IsString()
+	term?: string;
 }

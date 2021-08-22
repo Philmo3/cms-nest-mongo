@@ -28,10 +28,10 @@ export class SitesService extends CmsService<SiteDocument> {
 			company: new ObjectId(siteSearchDto.companyId),
 		};
 
-		if (siteSearchDto.name) {
+		if (siteSearchDto.term) {
 			searchQuery = {
 				...searchQuery,
-				name: { $regex: '.*' + siteSearchDto.name + '.*' },
+				name: { $regex: '.*' + siteSearchDto.term + '.*' },
 			};
 		}
 
