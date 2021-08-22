@@ -12,12 +12,18 @@ import { SiteDocument } from './sites.shema';
 const cryptoJs = require('crypto-js');
 
 import { appendPublicFile } from 'src/resources/functions/appendFile';
+import { CmsService } from 'src/resources/cmsService';
+import { SerializePaginationResultDto } from 'src/resources/dtos/paginationResult.dto';
 
 @Injectable()
-export class SitesService {
-	constructor(@InjectModel('sites') private siteModel: Model<SiteDocument>) {}
+export class SitesService extends CmsService<SiteDocument> {
+	constructor(@InjectModel('sites') protected siteModel: Model<SiteDocument>) {
+		super(siteModel);
+	}
 
-	async search(siteSearchDto: SiteSearchDto): Promise<SiteDto[]> {
+	async search(
+		siteSearchDto: SiteSearchDto,
+	): Promise<SerializePaginationResultDto> {
 		let searchQuery: any = {
 			company: new ObjectId(siteSearchDto.companyId),
 		};
@@ -33,20 +39,22 @@ export class SitesService {
 			searchQuery = { ...searchQuery, key: siteSearchDto.key };
 		}
 
-		const sites = await this.siteModel
-			.find(searchQuery, null, {
-				skip: (siteSearchDto.page - 1) * siteSearchDto.perPage,
-				limit: siteSearchDto.perPage,
-			})
-			.exec();
+		const response = await this.paginateQuery(
+			searchQuery,
+			+((siteSearchDto.page - 1) * siteSearchDto.perPage),
+			+siteSearchDto.perPage,
+		);
 
 		const siteSerializer = new SiteSerializer();
-
-		const serializedSite: SiteDto[] = sites.map((site) => {
+		const serializedSite: SiteDto[] = response.data.map((site) => {
 			return siteSerializer.documentToDto(site);
 		});
 
-		return serializedSite;
+		return {
+			data: serializedSite,
+			total: response.total,
+			pages: response.pages,
+		};
 	}
 
 	async create(
