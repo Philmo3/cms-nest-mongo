@@ -1,3 +1,4 @@
+import { env } from 'process';
 import { SiteDocument } from 'src/sites/sites.shema';
 import { SiteDto } from '../dtos/site.dto';
 import { ISerializer } from './Iserializer';
@@ -13,7 +14,7 @@ export class SiteSerializer implements ISerializer<SiteDocument> {
 			key: document.key,
 			hostUrl: document.hostUrl,
 			description: document.description,
-			siteImageUrl: document.siteImageUrl,
+			siteImageUrl: process.env.HOST + document.siteImageUrl,
 			companyId: document.company as any,
 		};
 	}
